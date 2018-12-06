@@ -1,4 +1,4 @@
-// -------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------- //<>//
 //                   Alcuni esercizi di manipolazione di immagine con Processing
 //
 // E' consigliato salvare una immagine di 500x500 pixel e nome imm.jpg nella directory dello sketch.
@@ -9,26 +9,67 @@ final String nomeFileFoto = "imm.jpg";
 void setup()
 {
   size(1000, 500);
-  noLoop();
+  //noLoop();
 }
 
 // scommentare una delle chiamate presenti in draw per sperimentare le varie funzioni implementate
 void draw()
 {
-  demoVarianteConTono();
+  //demoVarianteConTono();
   //demoSpecchiamento();
+  int sensitivity = (int) map(mouseX, 0, width, 1, 100);
+  demoSelezionaColore(color(170, 180, 130), sensitivity); // seleziona solo rosso, con range pari a 40
+}
+
+void demoSelezionaColore(color col, int range)
+{
+  PImage immOrig = loadImage(nomeFileFoto);
+  PImage immMod = selezionaColore(immOrig, col, range);
+  image(immOrig, 0, 0);
+  image(immMod, width/2, 0);
+}
+
+PImage selezionaColore(PImage immOrig, color desiredColor, int range)
+{
+  PImage immMod = createImage(immOrig.width, immOrig.height, RGB);
+  immOrig.loadPixels();
+  immMod.loadPixels();
+  color averageRGB;
+  final int nPixels = immOrig.width*immOrig.height;
+  for (int i = 0; i < nPixels; i++)
+  {
+    color colorOfThisPixel = immOrig.pixels[i];
+    averageRGB = (int) ( ( red(colorOfThisPixel) + green(colorOfThisPixel) + blue(colorOfThisPixel) )/3. );
+    if (inRange(colorOfThisPixel, desiredColor, range))
+    {
+      immMod.pixels[i] = immOrig.pixels[i];
+    } else
+    {
+      immMod.pixels[i] = color(averageRGB, averageRGB, averageRGB);
+    }
+  }
+  immMod.updatePixels();
+  return immMod;
+}
+
+boolean inRange(color colorOfThisPixel, color desiredColor, int range)
+{
+  if (abs(red(colorOfThisPixel) - red(desiredColor)) < range && abs(green(colorOfThisPixel) - green(desiredColor)) < range && abs(blue(colorOfThisPixel) - blue(desiredColor)) < range)
+  {
+    return true;
+  } else return false;
 }
 
 void demoVarianteConTono()
 {
   PImage immOrig = loadImage(nomeFileFoto);
   image(immOrig, 0, 0); // mostra l'immagine originale in alto a sinistra
-  
+
   PImage immMod;
-  
+
   immMod = varianteConTono(immOrig, "rosso"); // l'immagine con variante rossa
   image(immMod, width/2, 0); // in alto a destra
-  
+
   immMod = varianteConTono(immOrig, "blu"); // l'immagine con variante blu
   image(immMod, 0, height/2); // in basso a sx
 
@@ -36,7 +77,7 @@ void demoVarianteConTono()
   image(immMod, width/2, height/2); // in basso a dx
 
   immMod = varianteConTono(immOrig, "verde"); // l'immagine con variante verde
-  immMod.resize(300,180); // rimpicciolita
+  immMod.resize(300, 180); // rimpicciolita
   image(immMod, width/2-immMod.width/2, height/2-immMod.height/2); // al centro, sopra le altre
 }
 
@@ -47,7 +88,7 @@ void demoSpecchiamento()
 {
   PImage immOrig = loadImage(nomeFileFoto);
   image(immOrig, 0, 0); // mostra l'immagine originale in alto a sinistra
-  
+
   PImage specchiataOriz = specchiaOrizzontalmente(immOrig);
   image(specchiataOriz, width/2, 0);
 }
@@ -65,7 +106,7 @@ PImage specchiaOrizzontalmente(final PImage im)
   for (int row = 0; row < im.height; row++) // per ogni riga dell'immagine
   {
     int nPixelFinoQuestaRiga = im.width * row; // pixel esistenti nelle righe sopra questa
-    // swappa il pixel i con quello (width - i) //<>//
+    // swappa il pixel i con quello (width - i)
     for (int col = 0; col < nPixelsMezzaImmagine; col++) // per ogni colonna
     {
       pixelAttuale = nPixelFinoQuestaRiga + col;
@@ -75,7 +116,7 @@ PImage specchiaOrizzontalmente(final PImage im)
     }
   }
   newIm.updatePixels(); // ora aggiorno i pixel della nuova immagine
-  
+
   return newIm;
 }
 
@@ -111,31 +152,31 @@ PImage varianteConTono(PImage foto, String tono)
     // p.s. si sarebbe potuto evitare di metterlo qui, per questioni di efficienza, ma per ora va bene cosi'
     switch (tono)
     {
-      case "rosso":
-        // variante rossa
-        fotoMod.pixels[i] = color(media, 0, 0);
-        break;
-        
-      case "verde":
-        // variante verde
-        fotoMod.pixels[i] = color(0, media, 0);
-        break;
-        
-      case "blu":
-        // variante blu
-        fotoMod.pixels[i] = color(0, 0, media);
-        break;
-        
-      case "grigio":
-        fotoMod.pixels[i] = color(media, media, media);
-        break;
-        
-      default:
-        println("errore sulla selezione del tono !");
+    case "rosso":
+      // variante rossa
+      fotoMod.pixels[i] = color(media, 0, 0);
+      break;
+
+    case "verde":
+      // variante verde
+      fotoMod.pixels[i] = color(0, media, 0);
+      break;
+
+    case "blu":
+      // variante blu
+      fotoMod.pixels[i] = color(0, 0, media);
+      break;
+
+    case "grigio":
+      fotoMod.pixels[i] = color(media, media, media);
+      break;
+
+    default:
+      println("errore sulla selezione del tono !");
     } // fine switch sul tono
   }
   fotoMod.updatePixels(); // ricordarsi questo, dopo che si e' lavorato sui pixel di una PImage !
-  
+
   return fotoMod;
 }
 
@@ -155,7 +196,7 @@ void mostraMetaSup(PImage im, final int x, final int y)
     newIm.pixels[i] = im.pixels[i];
   }
   newIm.updatePixels();
-  
+
   image(newIm, x, y);
 }
 
@@ -169,6 +210,6 @@ void mostraMetaInf(PImage im, final int x, final int y)
     newIm.pixels[i] = im.pixels[i];
   }
   newIm.updatePixels();
-  
+
   image(newIm, x, y);
 }
