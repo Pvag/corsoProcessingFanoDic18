@@ -27,7 +27,7 @@ void setup()
   cp5.addSlider("coloreCerchio")
      .setPosition(100, 50)
      .setRange(0, 255/3)
-     .setCaptionLabel("colore crechio")
+     .setCaptionLabel("colore cerchio")
      ;
 }
 
