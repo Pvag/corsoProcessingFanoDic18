@@ -4,29 +4,105 @@
 // E' consigliato salvare una immagine di 500x500 pixel e nome imm.jpg nella directory dello sketch.
 // -------------------------------------------------------------------------------------------------
 
+import controlP5.*;
+
 final String nomeFileFoto = "imm.jpg";
+Bottone bottoneSelezionaColore;
+int elapsed, lastValidClickTime;
+boolean runDemoSelezionaColore;
+ControlP5 cp5;
+int sliderSensitivita;
 
 void setup()
 {
   size(1000, 500);
   //noLoop();
+  
+  cp5 = new ControlP5(this);
+  
+  cp5.addSlider("sliderSensitivita")
+     .setPosition(100, 20)
+     .setRange(1, 100)
+     .setCaptionLabel("sensitivita")
+     ;
+
+  bottoneSelezionaColore = new Bottone(20, 20, "Bob");
+  elapsed = 0;
+  lastValidClickTime = 0;
+  runDemoSelezionaColore = false;
+  sliderSensitivita = 0;
+
+  pulisciBackground();
 }
 
 // scommentare una delle chiamate presenti in draw per sperimentare le varie funzioni implementate
 void draw()
 {
+  // le due demo qui sotto non hanno bisogno di loop()
   //demoVarianteConTono();
   //demoSpecchiamento();
-  int sensitivity = (int) map(mouseX, 0, width, 1, 100);
-  demoSelezionaColore(color(170, 180, 130), sensitivity); // seleziona solo rosso, con range pari a 40
+
+  if (runDemoSelezionaColore)
+  {
+    cp5.setVisible(true);
+    //int sensitivity = (int) map(mouseX, 0, width, 1, 100);
+    demoSelezionaColore(color(170, 180, 130));
+  } else
+  {
+    cp5.setVisible(false);
+    pulisciBackground();
+  }
+
+  ascoltaClick();
+  bottoneSelezionaColore.render();
 }
 
-void demoSelezionaColore(color col, int range)
+void pulisciBackground()
+{
+  background(100);
+}
+
+// Funge da meccanismo "anti-rimbalzo"
+// E' necessario, perche' quello che per noi e' un click rapido, per processing sono click ripetuti
+// in molti frame, tanti di piu', quanto maggiore e' la frequenza di aggiornamento (frameRate).
+void ascoltaClick()
+{
+  if (mousePressed) // se il mouse e' stato premuto
+  {
+    int now = millis(); // il tempo assoluto (rispetto al lancio dello sketch)
+    elapsed = now - lastValidClickTime; // conta quanti millisecondi sono trascorsi dall'ultimo click
+    if (elapsed > 500) // se dall'ultimo click e' trascorso piu' di mezzo secondo (500 millisecondi)
+    {
+      bottoneSelezionaColore.checkPressed(); // allora aggiorna il bottone
+      if (bottoneSelezionaColore.pressed)
+      {
+        startDemoSelezionaColore();
+      } else
+      {
+        stopDemoSelezioneColore();
+      }
+      lastValidClickTime = now; // tieni traccia del tempo attuale
+    }
+  }
+}
+
+void startDemoSelezionaColore()
+{
+  runDemoSelezionaColore = true;
+}
+
+void stopDemoSelezioneColore()
+{
+  runDemoSelezionaColore = false;
+}
+
+void demoSelezionaColore(color col)
 {
   PImage immOrig = loadImage(nomeFileFoto);
-  PImage immMod = selezionaColore(immOrig, col, range);
+  PImage immMod = selezionaColore(immOrig, col, sliderSensitivita);
   image(immOrig, 0, 0);
   image(immMod, width/2, 0);
+  cp5.setVisible(true);
 }
 
 PImage selezionaColore(PImage immOrig, color desiredColor, int range)
