@@ -7,59 +7,149 @@
 import controlP5.*;
 
 final String nomeFileFoto = "imm.jpg";
-Bottone bottoneSelezionaColore;
+Bottone bottoneSelezionaColore, colorPicker;
 int elapsed, lastValidClickTime;
-boolean runDemoSelezionaColore;
-ControlP5 cp5;
-int sliderSensitivita;
+boolean runDemoSelezionaColore, modalitaSelezionaColore, modalitaColorPicker;
+ControlP5 sensitivitaSlider, rgbSliders;
+int sliderSensitivita, sliderR, sliderG, sliderB;
+final int largBandaPulsanti = 200;
+final int x0 = largBandaPulsanti;
+final int millisAntiRimbalzo = 400;
+PImage immOrig, immMod;
+color lastColor;
 
 void setup()
 {
-  size(1000, 500);
+  size(1200, 500);
   //noLoop();
-  
-  cp5 = new ControlP5(this);
-  
-  cp5.addSlider("sliderSensitivita")
-     .setPosition(100, 20)
-     .setRange(1, 100)
-     .setCaptionLabel("sensitivita")
-     ;
 
-  bottoneSelezionaColore = new Bottone(20, 20, "Bob");
+  sensitivitaSlider = new ControlP5(this);
+  sensitivitaSlider.addSlider("sliderSensitivita")
+    .setPosition(20, 60)
+    .setRange(1, 100)
+    .setCaptionLabel("sensitivita")
+    ;
+
+  rgbSliders = new ControlP5(this);
+  rgbSliders.addSlider("sliderR")
+    .setPosition(20, 80)
+    .setRange(1, 255)
+    .setCaptionLabel("R")
+    ;
+
+  rgbSliders.addSlider("sliderG")
+    .setPosition(20, 100)
+    .setRange(1, 255)
+    .setCaptionLabel("G")
+    ;
+
+  rgbSliders.addSlider("sliderB")
+    .setPosition(20, 120)
+    .setRange(1, 255)
+    .setCaptionLabel("B")
+    ;
+
+  bottoneSelezionaColore = new Bottone(20, 20, "Seleziona Colore");
+  colorPicker = new Bottone(20, 140, "Sel. con Mouse");
   elapsed = 0;
   lastValidClickTime = 0;
   runDemoSelezionaColore = false;
+  modalitaSelezionaColore = false;
+  modalitaColorPicker = false;
   sliderSensitivita = 0;
+
+  immMod = loadImage(nomeFileFoto);
+
+  lastColor = color(100, 100, 100);
 
   pulisciBackground();
 }
 
-// scommentare una delle chiamate presenti in draw per sperimentare le varie funzioni implementate
 void draw()
 {
-  // le due demo qui sotto non hanno bisogno di loop()
-  //demoVarianteConTono();
-  //demoSpecchiamento();
+  ascoltaClick();
 
-  if (runDemoSelezionaColore)
+  if (modalitaSelezionaColore)
   {
-    cp5.setVisible(true);
+    mostraInterfacciaSelezionaColore();
     //int sensitivity = (int) map(mouseX, 0, width, 1, 100);
-    demoSelezionaColore(color(170, 180, 130));
+    //if (picker.clicked) color c = picker.getColor();
+    //color col;
+    //if (isPickingColor(colorPicker)) {
+    //  colorPicker.render();
+    //} else
+    //{
+    //  col = color(sliderR, sliderB, sliderG);
+    //}
+    //demoSelezionaColore(col, immOrig);
+    rgbSliders.setVisible(true);
+    if (modalitaColorPicker)
+    {
+      rgbSliders.setVisible(false); // IMPLEMENTARE !
+      if (mousePressed && mouseX > x0)
+      {
+        lastColor = getColorUnderCursor();
+      }
+      immMod = selezionaColore(immOrig, immMod, lastColor, sliderSensitivita);
+    } else
+    {
+      immMod = selezionaColore(immOrig, immMod, color(sliderR, sliderG, sliderB), sliderSensitivita);
+    }
+    mostraImmMod();
   } else
   {
-    cp5.setVisible(false);
     pulisciBackground();
+    rgbSliders.setVisible(false);
+    sensitivitaSlider.setVisible(false);
   }
 
-  ascoltaClick();
-  bottoneSelezionaColore.render();
+  mostraInterfacciaBase();
+  immOrig = showOriginalImage();
+}
+
+PImage showOriginalImage()
+{
+  PImage immOrig = loadImage(nomeFileFoto);
+  image(immOrig, x0, 0); 
+  return immOrig;
+}
+
+boolean isPickingColor(Bottone colorPicker)
+{
+  if (colorPicker.pressed) return true;
+  else return false;
+}
+
+color getColorUnderCursor()
+{
+  return get(mouseX, mouseY);
 }
 
 void pulisciBackground()
 {
   background(100);
+}
+
+
+//////////
+//PImage immMod = createImage(immOrig.width, immOrig.height, RGB);
+
+
+void mostraInterfacciaBase()
+{
+  bottoneSelezionaColore.render();
+}
+
+void mostraInterfacciaSelezionaColore()
+{
+  sensitivitaSlider.setVisible(true);
+  colorPicker.render();
+}
+
+void aggiornaInterfacciaDiBottoni()
+{
+  mostraInterfacciaBase();
+  mostraInterfacciaSelezionaColore();
 }
 
 // Funge da meccanismo "anti-rimbalzo"
@@ -71,43 +161,33 @@ void ascoltaClick()
   {
     int now = millis(); // il tempo assoluto (rispetto al lancio dello sketch)
     elapsed = now - lastValidClickTime; // conta quanti millisecondi sono trascorsi dall'ultimo click
-    if (elapsed > 500) // se dall'ultimo click e' trascorso piu' di mezzo secondo (500 millisecondi)
+    if (elapsed > millisAntiRimbalzo) // se dall'ultimo click e' trascorso piu' di mezzo secondo (500 millisecondi)
     {
       bottoneSelezionaColore.checkPressed(); // allora aggiorna il bottone
       if (bottoneSelezionaColore.pressed)
       {
-        startDemoSelezionaColore();
-      } else
+        modalitaSelezionaColore = true;
+        colorPicker.checkPressed();
+        if (colorPicker.pressed) modalitaColorPicker = true;
+        else modalitaColorPicker = false;
+      } else 
       {
-        stopDemoSelezioneColore();
+        modalitaSelezionaColore = false;
+        modalitaColorPicker = false;
       }
+
       lastValidClickTime = now; // tieni traccia del tempo attuale
     }
   }
 }
 
-void startDemoSelezionaColore()
+void mostraImmMod()
 {
-  runDemoSelezionaColore = true;
+  image(immMod, immOrig.width+x0, 0);
 }
 
-void stopDemoSelezioneColore()
+PImage selezionaColore(PImage immOrig, PImage immMod, color desiredColor, int range)
 {
-  runDemoSelezionaColore = false;
-}
-
-void demoSelezionaColore(color col)
-{
-  PImage immOrig = loadImage(nomeFileFoto);
-  PImage immMod = selezionaColore(immOrig, col, sliderSensitivita);
-  image(immOrig, 0, 0);
-  image(immMod, width/2, 0);
-  cp5.setVisible(true);
-}
-
-PImage selezionaColore(PImage immOrig, color desiredColor, int range)
-{
-  PImage immMod = createImage(immOrig.width, immOrig.height, RGB);
   immOrig.loadPixels();
   immMod.loadPixels();
   color averageRGB;
