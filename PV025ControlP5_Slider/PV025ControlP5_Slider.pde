@@ -14,13 +14,13 @@ void setup()
   // http://www.sojamo.de/libraries/controlP5/examples/controllers/ControlP5slider/ControlP5slider.pde
   cp5.addSlider("sliderValue")
      .setPosition(100, 10)
-     .setRange(0, 200)
-     .setCaptionLabel("colore sfondo")
+     .setRange(0, 255)
+     .setCaptionLabel("colore di sfondo")
      ;
 
   cp5.addSlider("raggio")
      .setPosition(100, 30)
-     .setRange(0, 200)
+     .setRange(0, 500)
      .setCaptionLabel("raggio")
      ;
 
