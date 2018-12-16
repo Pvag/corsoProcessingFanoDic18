@@ -6,11 +6,14 @@
 // nomi[1] contiene "Daniele"
 // ...ecc
 String[] nomi = {"Filippo", "Daniele", "Andrea", "Davide", "Lorenzo", "Paolo"};
+String mioNome = "Paolo";
+
 
 void setup()
 {
   size(400, 100);
   frameRate(1);
+  println(nomi[5]);
 }
 
 void draw()
