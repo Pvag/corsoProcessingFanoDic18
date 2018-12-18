@@ -1,5 +1,9 @@
-// disegna un fiore che, muovendo il mouse da sinistra a destra,
-// ruota, cresce e cambia colore
+// Disegna un fiore che, muovendo il mouse da sinistra a destra,
+// ruota, cresce e cambia colore.
+
+// Post sul Forum: http://esplora.freeforums.net/thread/55/fiore-rotante-crescente
+
+// GitHub: https://github.com/Pvag/corsoProcessingFanoDic18/tree/master/PV035FioreRotanteCresce
 
 void setup()
 {
