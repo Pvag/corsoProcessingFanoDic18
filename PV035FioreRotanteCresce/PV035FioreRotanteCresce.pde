@@ -5,6 +5,8 @@
 
 // GitHub: https://github.com/Pvag/corsoProcessingFanoDic18/tree/master/PV035FioreRotanteCresce
 
+final int nPetali = 5;
+
 void setup()
 {
   size(600, 300);
@@ -13,10 +15,9 @@ void setup()
 void draw()
 {
   background(255);
-  
+
   float fi0 = map(mouseX, 0, width, 0., TAU); // rotazione iniziale complessiva, del fiore
   int diamPetali = int(map(mouseX, 0, width, 0, 200)); // diametro del petalo
-  final int nPetali = 5;
   fiore(mouseX, mouseY, nPetali, diamPetali, fi0);
 }
 
