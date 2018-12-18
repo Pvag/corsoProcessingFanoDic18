@@ -8,7 +8,7 @@
 
 // Post sul forum: http://esplora.freeforums.net/thread/54/010-una-linea-di-cerchi
 
-// Codice su GitHub: 
+// Codice su GitHub: https://github.com/Pvag/corsoProcessingFanoDic18/tree/master/CompitiPerCasa/CPC_010_lineaDiCerchi
 
 int[] x, y;
 final int nCerchi = 8;
@@ -16,7 +16,7 @@ final int diam = 30;
 
 void setup()
 {
-  size(500, 300);
+  size(360, 150);
   initPos();
 }
 
